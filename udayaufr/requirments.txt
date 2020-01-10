@@ -1,0 +1,6 @@
+Django==2.2.2
+django-cors-headers==3.0.2
+tensorflow==1.13.1
+django-filter==2.1.0
+django-rest-auth==0.9.5
+djangorestframework==3.9.4
