@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 
 #!/usr/bin/env python3
 from facenet_pytorch import MTCNN, InceptionResnetV1, prewhiten, training
@@ -22,24 +21,21 @@ import math
 import dlib
 from imutils import face_utils
 from torchvision.transforms import functional as F
-
+import time
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
-net = cv2.dnn.readNetFromCaffe(APP_ROOT+'/data/face/deploy.prototxt', APP_ROOT+'/data/face/res10_300x300_ssd_iter_140000.caffemodel')
-gender_list = ['Male', 'Female']
-gender_net = cv2.dnn.readNetFromCaffe(
-		APP_ROOT+'/data/gender/deploy_gender.prototxt', 
-		APP_ROOT+'/data/gender/gender_net.caffemodel')
 
-
-age_list = ['(0, 2)', '(4, 6)', '(8, 12)', '(15, 20)', '(25, 32)', '(38, 43)', '(48, 53)', '(60, 100)']
-age_net = cv2.dnn.readNetFromCaffe(APP_ROOT+'/data/age/deploy_age.prototxt',APP_ROOT+'/data/age/age_net.caffemodel')
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 resnet = InceptionResnetV1(pretrained='vggface2').eval().to(device)
+root_path = APP_ROOT.replace('/utils','')
 # resnet = InceptionResnetV1(classify=True, num_classes=1001).eval()
-p = "/Users/thaungmonyodam/KIT/UDAYA/udaya-face-ui/face/encode/shape_predictor_68_face_landmarks.dat"
+
+shape_predictor_68_face_landmarks  = APP_ROOT + "/model/shape_predictor_68_face_landmarks.dat"
 detector = dlib.get_frontal_face_detector()
-predictor = dlib.shape_predictor(p)
+predictor = dlib.shape_predictor()
+
+# path of embedding
+path_embedding = root_path  + "/media/fr/embeddings/"
 
 
 def fixed_image_standardization(image_tensor):
@@ -86,7 +82,7 @@ def embedding_caluation(face_image):
 
 
 def distance_face(emb1, emb2):
-    return np.linalg.norm(emb1 - emb2)
+    return np.sqrt(((emb1 - emb2) ** 2).sum())
 
     
 def save_embedding(embedding, filename, embeddings_path):
@@ -105,28 +101,28 @@ def remove_file_extension(filename):
     return filename
 
 def identify_face(embedding):
-    
-    path_embedding = "/Users/thaungmonyodam/KIT/UDAYA/face/udayaufr/media/fr/embeddings/*.npy"
-    path = "/Users/thaungmonyodam/KIT/UDAYA/face/udayaufr/media/fr/embeddings/"
+    # start = time.time()
     min_distance = 100
     result = "unknow"
     embeddings = []
     names = []
     try:
-        for embedding_file in glob.iglob(path_embedding):
+        for embedding_file in glob.iglob(path_embedding+"*.npy"):
             database_embedding = np.load(embedding_file)
             distance = distance_face(embedding,database_embedding)
             if distance < min_distance:
                 min_distance = distance
                 result =  remove_file_extension(embedding_file)
-                result = result.replace(path,'')  
-                embeddings.append(database_embedding)
-                names.append(result)
+                result = result.replace(path_embedding,'')  
         proba = face_distance_to_conf(min_distance)
+        # print("Neural network forward pass took {} seconds.".format(
+        #         time.time() - start))
+        print(proba,embeddings)
         if proba > 0.90:
             return result+" {0:.2f}".format(proba*100)+"%"
-        return "unknow"+" {0:.2f}".format(proba*100)+"%"   
+        return "unknow"
     except Exception as e:
+        print(e)
         return "unknow"
 
 

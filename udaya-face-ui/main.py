@@ -14,6 +14,7 @@ from PIL import Image
 import base64
 import dlib
 from imutils import face_utils
+import time
 
 ws = create_connection("ws://localhost:8001/websocket")
 p = "/Users/thaungmonyodam/KIT/UDAYA/udaya-face-ui/face/encode/shape_predictor_68_face_landmarks.dat"
@@ -76,7 +77,6 @@ class AUFR(QMainWindow):
         self.set_camera_btn.clicked.connect(self.camera_login)
         self.search_face_btn.clicked.connect(self.search_face)
         
-        
     def start_timer(self):      # start the timeer for execution.
         self.capture = cv2.VideoCapture(self.camera_id)
         self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
@@ -99,16 +99,25 @@ class AUFR(QMainWindow):
         self.ret = False
         self.capture.release()
         
+    def convert_to_gbit(value):
+        return value/1024./1024./1024.*8
+
+    def send_stat(value):
+        print ("%0.3f" % convert_to_gbit(value))
+        
     def update_image(self):     # update canvas every time according to time set in the timer.
         if self.recognize_face_btn.isChecked():
             self.ret, self.image = self.capture.read()
             self.image = cv2.flip(self.image, 1)
             faces = self.get_faces()
             self.draw_rectangle(faces)
+            start = time.time()
             for (x, y, w, h) in faces:
                 name = self.recognize_web_socket(self.resize_image(self.image[y:y+h, x:x+w]))
                 cv2.putText(self.image,name , (x, y-10),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 215, 0), 1, cv2.LINE_AA)
+        print("Neural network forward pass took {} seconds.".format(
+                time.time() - start))
         self.display()
         
     def search_face(self):     # update canvas every time according to time set in the timer.
@@ -200,7 +209,9 @@ class AUFR(QMainWindow):
             (x, y, w, h) = face_utils.rect_to_bb(rect)
             cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
             roi_image = image[y:y+h, x:x+w]
-            name = self.recognize_web_socket(self.resize_image(image[y:y+h, x:x+w]))
+            if roi_image.size != 0:
+                name = self.recognize_web_socket(self.resize_image(roi_image))
+                cv2.putText(image, name, (x - 10, y - 10),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
             
 
             # print(encode_face)
@@ -208,8 +219,7 @@ class AUFR(QMainWindow):
             # socket_call(data)
         
             # show the face number
-            cv2.putText(image, 'Face #{}'.format(i + 1) + name, (x - 10, y - 10),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+            
         
             # loop over the (x, y)-coordinates for the facial landmarks
             # and draw them on the image
@@ -238,6 +248,7 @@ class AUFR(QMainWindow):
             data = face_register.face_register_api(face_image ="face.jpg" ,name=self.name ,path="false")
             data = data.decode('utf8').replace("'", '"')
             data = json.loads(data)
+            #print(data)
             QMessageBox().about(self, "Face Register", data['data'][0]['msg'])
             self.register_btn.setText("Register")
             self.stop_timer()
@@ -297,7 +308,7 @@ class AUFR(QMainWindow):
         result =  ws.recv()
         return result
     
-    def resize_image(self, image, width=160, height=160): # Resize image before storing.
+    def resize_image(self, image, width=180, height=180): # Resize image before storing.
         return cv2.resize(image, (width,height), interpolation = cv2.INTER_CUBIC)
                 
     def about_info(self):       # Menu Information of info button of application.

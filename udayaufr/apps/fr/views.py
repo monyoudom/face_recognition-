@@ -22,12 +22,9 @@ MODEL_MEAN_VALUES = (78.4263377603, 87.7689143744, 114.895847746)
 def register(request):
       user_face = UserFaceDataset()
       if request.method == "POST":
-        
-      
         user_name  = request.POST['user_name']
         path       = request.POST['path']
-        
-
+  
         # varible for upload image
         upload_face_image = join(settings.MEDIA_ROOT,'fr/faces/'+str(user_name)+'.png')
         face_embedding = join(settings.MEDIA_ROOT,'fr/embeddings/')
@@ -91,7 +88,6 @@ def search(request):
         image = imread(name=face_image, mode='RGB')
         
       # face detection    
-
       face = face_dlib(image)
       if face is None:
         return JsonResponse({'errors': {'error_message': 'No face detected or Eyes detected'}})
