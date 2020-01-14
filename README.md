@@ -11,7 +11,8 @@
 
 ## Frontend:
   - Python ( QT )
-## Django
+## Backend
+   - Django
 
 ## Build Setup
 
