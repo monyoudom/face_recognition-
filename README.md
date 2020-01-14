@@ -1,7 +1,7 @@
 <h1 align="center">
   <br>
   <br>
-  A2A Digital
+  Udaya
   <br>
 </h1>
 
