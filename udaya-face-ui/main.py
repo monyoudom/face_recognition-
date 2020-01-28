@@ -16,8 +16,9 @@ import dlib
 from imutils import face_utils
 import time
 
-ws = create_connection("ws://localhost:8001/websocket")
-p = "/Users/thaungmonyodam/KIT/UDAYA/udaya-face-ui/face/encode/shape_predictor_68_face_landmarks.dat"
+APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+ws = create_connection("ws://192.168.11.78:8001/websocket")
+p =APP_ROOT + "/static/shape_predictor_68_face_landmarks.dat"
 
 class USER(QDialog):        # Dialog box for entering name and key of new dataset.
     """USER Dialog """
@@ -68,14 +69,12 @@ class AUFR(QMainWindow):
         self.image_encode = 0
         # Actions 
         self.register_btn.setCheckable(True)
-        self.set_camera_btn.setCheckable(True)
+        # self.set_camera_btn.setCheckable(True)
         self.recognize_face_btn.setCheckable(True)
-        self.search_face_btn.setCheckable(True)
+        # self.search_face_btn.setCheckable(True)
         # Events
         self.recognize_face_btn.clicked.connect(self.recognize)
         self.register_btn.clicked.connect(self.generate)
-        self.set_camera_btn.clicked.connect(self.camera_login)
-        self.search_face_btn.clicked.connect(self.search_face)
         
     def start_timer(self):      # start the timeer for execution.
         self.capture = cv2.VideoCapture(self.camera_id)
@@ -86,9 +85,8 @@ class AUFR(QMainWindow):
             self.timer.timeout.connect(self.save_dataset)
         if self.recognize_face_btn.isChecked():
             self.timer.timeout.connect(self.update_image)
-        if self.search_face_btn.isChecked():
-            self.timer.timeout.connect(self.search)
-        self.timer.start(5)
+
+        self.timer.start(100)
         
     def stop_timer(self):       # stop timer or come out of the loop.
         self.image = cv2.imread("icon/can.jpg", 1)
@@ -99,52 +97,16 @@ class AUFR(QMainWindow):
         self.ret = False
         self.capture.release()
         
-    def convert_to_gbit(value):
-        return value/1024./1024./1024.*8
-
-    def send_stat(value):
-        print ("%0.3f" % convert_to_gbit(value))
-        
     def update_image(self):     # update canvas every time according to time set in the timer.
         if self.recognize_face_btn.isChecked():
             self.ret, self.image = self.capture.read()
             self.image = cv2.flip(self.image, 1)
             faces = self.get_faces()
             self.draw_rectangle(faces)
-            start = time.time()
             for (x, y, w, h) in faces:
                 name = self.recognize_web_socket(self.resize_image(self.image[y:y+h, x:x+w]))
                 cv2.putText(self.image,name , (x, y-10),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 215, 0), 1, cv2.LINE_AA)
-        print("Neural network forward pass took {} seconds.".format(
-                time.time() - start))
-        self.display()
-        
-    def search_face(self):     # update canvas every time according to time set in the timer.
-        if self.search_face_btn.isChecked():
-            self.start_timer()
-            self.search_face_btn.setText("Okay")
-        else:
-            search_face_call = SearchFace()
-            data = search_face_call.search_face_api(face_image ="face.jpg" ,path="false")
-            data = data.decode('utf8').replace("'", '"')
-            data = json.loads(data)
-            QMessageBox().about(self, "Face Register", data['data'][0]['msg'])
-            self.search_face_btn.setText("Search")
-            self.stop_timer()
- 
-    def search(self):
-        if self.search_face_btn.isChecked():
-            self.ret, self.image = self.capture.read()
-            self.image = cv2.flip(self.image, 1)
-            faces = self.get_faces()
-            self.draw_rectangle(faces)
-            if len(faces) is not 1 or len(faces) == 0:
-                self.draw_text("Only One Person at a time or face not found")
-            else:
-                for (x, y, w, h) in faces:
-                    cv2.imwrite('face.jpg', self.resize_image(self.image[y:y+h, x:x+w]))
-    
         self.display()
         
     def display(self):      # Display in the canvas, video feed.
@@ -192,43 +154,6 @@ class AUFR(QMainWindow):
         					minSize = min_size)
 
         return faces
-    def face_landmark_detection(self,image):
-       
-        # detect faces in the grayscale image
-        rects = self.detector(image, 1)
-        # loop over the face detections
-        for (i, rect) in enumerate(rects):
-                # determine the facial landmarks for the face region, then
-            # convert the facial landmark (x, y)-coordinates to a NumPy
-            # array
-            shape = self.predictor(image, rect)
-            shape = face_utils.shape_to_np(shape)
-        
-            # convert dlib's rectangle to a OpenCV-style bounding box
-            # [i.e., (x, y, w, h)], then draw the face bounding box
-            (x, y, w, h) = face_utils.rect_to_bb(rect)
-            cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
-            roi_image = image[y:y+h, x:x+w]
-            if roi_image.size != 0:
-                name = self.recognize_web_socket(self.resize_image(roi_image))
-                cv2.putText(image, name, (x - 10, y - 10),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-            
-
-            # print(encode_face)
-            # data = cv2.imencode('.jpg', roi_face)[1].tostring()
-            # socket_call(data)
-        
-            # show the face number
-            
-        
-            # loop over the (x, y)-coordinates for the facial landmarks
-            # and draw them on the image
-            
-            # for (x, y) in shape:
-            #     cv2.circle(image, (x, y), 1, (0, 0, 255), -1)
-            if self.register_btn.isChecked():
-                cv2.imwrite('face.jpg', image)
-        return image
     
     def save_dataset(self):     # Save images of new dataset generated using generate dataset button.
 
@@ -258,9 +183,6 @@ class AUFR(QMainWindow):
 
     def draw_rectangle(self, faces):  
         for (x, y, w, h) in faces:
-            # roi_gray_original = self.get_gray_image()[y:y + h, x:x + w]
-            # roi_gray = self.resize_image(roi_gray_original, 92, 112)
-            # roi_color = self.image[y:y+h, x:x+w]
             cv2.rectangle(self.image, (x, y), (x + w, y + h), (0, 255, 0), 2)
         
     def draw_text(self, text, x=20, y=20, font_size=2, color = (0, 255, 0)): # Draw text in current image in particular color.
@@ -271,30 +193,19 @@ class AUFR(QMainWindow):
             try:
                 user = USER()
                 user.exec_()
-                name = user.get_name()
-                self.name = name
-                self.start_timer()
-                self.register_btn.setText("Generating")
+                if user.get_name() ==  "":
+                    msg = QMessageBox()
+                    msg.about(self, "User Information", '''Provide Information Please! \n name[string]''')
+                    self.register_btn.setChecked(False)
+                    self.stop_timer()
+                else:
+                    name = user.get_name()
+                    self.name = name
+                    self.start_timer()
+                    self.register_btn.setText("Generating")
             except:
                 print("eroror",sys.exc_info()[0])
-                msg = QMessageBox()
-                msg.about(self, "User Information", '''Provide Information Please! \n name[string]\n key[integer]''')
-                self.register_btn.setChecked(False)
-                
-    def camera_login(self):
-        if self.set_camera_btn.isChecked():
-            try:
-                camera = CAMERA()
-                camera.exec_()
-                name, key = user.get_name_key()
-                connect = 'rtsp://'+name+':'+key+'@192.168.1.64/1'
-                self.set_camera_btn.isChecked(False)
-            except:
-                msg = QMessageBox()
-                msg.about(self, "Error", '''Cannot connect''')
-                self.set_camera_btn.isChecked(False)
-  
-                
+                              
     def recognize_web_socket(self,frame):
         # print(self.opencv_image_to_binary_image(self.image))
         _, img_encoded = cv2.imencode('.jpg', frame)

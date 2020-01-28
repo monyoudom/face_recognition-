@@ -29,6 +29,9 @@
    <iconset>
     <normaloff>icon/app_icon.jpg</normaloff>icon/app_icon.jpg</iconset>
   </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(48, 49, 50);</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QFrame" name="frame">
     <property name="geometry">
@@ -36,7 +39,7 @@
       <x>190</x>
       <y>10</y>
       <width>870</width>
-      <height>560</height>
+      <height>621</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -46,9 +49,9 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>0</y>
+       <y>-40</y>
        <width>870</width>
-       <height>641</height>
+       <height>661</height>
       </rect>
      </property>
      <property name="text">
@@ -62,7 +65,7 @@
       <x>10</x>
       <y>10</y>
       <width>171</width>
-      <height>631</height>
+      <height>621</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -80,24 +83,11 @@
      <property name="title">
       <string>ACTIONS</string>
      </property>
-     <widget class="QPushButton" name="set_camera_btn">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>30</y>
-        <width>120</width>
-        <height>29</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Camera</string>
-      </property>
-     </widget>
      <widget class="QPushButton" name="register_btn">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>70</y>
+        <y>40</y>
         <width>120</width>
         <height>29</height>
        </rect>
@@ -110,16 +100,22 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>110</y>
+        <y>80</y>
         <width>120</width>
         <height>29</height>
        </rect>
+      </property>
+      <property name="whatsThis">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;dd&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
       </property>
       <property name="text">
        <string>Recognize</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="search_face_btn">
+     <widget class="QPushButton" name="exit_btn">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -129,161 +125,9 @@
        </rect>
       </property>
       <property name="text">
-       <string>Search</string>
+       <string>Exit</string>
       </property>
      </widget>
-    </widget>
-    <widget class="QPushButton" name="exit_btn">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>590</y>
-       <width>120</width>
-       <height>29</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Exit</string>
-     </property>
-    </widget>
-    <widget class="QGroupBox" name="groupBox_3">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>230</y>
-       <width>151</width>
-       <height>141</height>
-      </rect>
-     </property>
-     <property name="title">
-      <string>OPTIONS</string>
-     </property>
-     <widget class="QRadioButton" name="radioButton">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>40</y>
-        <width>100</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>   WEBCAM</string>
-      </property>
-     </widget>
-     <widget class="QRadioButton" name="radioButton_2">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>80</y>
-        <width>100</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>   IP Camera</string>
-      </property>
-     </widget>
-    </widget>
-   </widget>
-   <widget class="QFrame" name="frame">
-    <property name="geometry">
-     <rect>
-      <x>190</x>
-      <y>580</y>
-      <width>871</width>
-      <height>61</height>
-     </rect>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::Panel</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Plain</enum>
-    </property>
-    <widget class="QProgressBar" name="progress_bar_recognize">
-     <property name="geometry">
-      <rect>
-       <x>650</x>
-       <y>20</y>
-       <width>118</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="value">
-      <number>0</number>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_3">
-     <property name="geometry">
-      <rect>
-       <x>560</x>
-       <y>20</y>
-       <width>71</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Confidence</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label">
-     <property name="geometry">
-      <rect>
-       <x>330</x>
-       <y>20</y>
-       <width>54</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Trainined</string>
-     </property>
-    </widget>
-    <widget class="QProgressBar" name="progress_bar_train">
-     <property name="geometry">
-      <rect>
-       <x>410</x>
-       <y>20</y>
-       <width>118</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="maximum">
-      <number>3</number>
-     </property>
-     <property name="value">
-      <number>0</number>
-     </property>
-     <property name="format">
-      <string>%p%</string>
-     </property>
-    </widget>
-    <widget class="QProgressBar" name="progress_bar_generate">
-     <property name="geometry">
-      <rect>
-       <x>180</x>
-       <y>20</y>
-       <width>118</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="value">
-      <number>0</number>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_2">
-     <property name="geometry">
-      <rect>
-       <x>100</x>
-       <y>20</y>
-       <width>61</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Generated</string>
-     </property>
     </widget>
    </widget>
   </widget>
@@ -302,5 +146,22 @@
   </widget>
  </widget>
  <resources/>
- <connections/>
+  <connections>
+  <connection>
+   <sender>exit_btn</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>748</x>
+     <y>648</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>809</x>
+     <y>719</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

@@ -6,6 +6,7 @@ import numpy as np
 from scipy.misc import imread
 import base64
 
+
 def get_embedding(face):
   embedding = embedding_caluation(face)
   return embedding.detach().numpy()
@@ -13,7 +14,6 @@ def get_embedding(face):
 def insert_embedding(face,name,path):
   embedding = get_embedding(face)
   validation = search_face(face)
-  print(validation)
   if validation == "unknow":
     save_embedding(embedding=embedding, filename=name, embeddings_path=path)
     return name+".npy"
@@ -27,15 +27,19 @@ def search_face(face):
   return name
 
 def face_live_p_1(frame):
+  frame = frame.replace('data:image/jpeg;base64,','')
   jpg_original = base64.b64decode(frame)
   nparr = np.fromstring(jpg_original, np.uint8)
   img = cv2.imdecode(nparr, cv2.COLOR_RGB2BGR) 
   face = face_dlib(img)
   if face is None:
-    return "unknow"
+    return "1"
   face  = covert_to_tensor(face)
   name = search_face(face)
-  return name
+  if name == "unknow":
+    return "0"
+  else:
+    return "2-"+name
 
 
   

@@ -16,10 +16,9 @@ import json
 from django.http import HttpResponse
 from scipy.misc import imread
 
-MODEL_MEAN_VALUES = (78.4263377603, 87.7689143744, 114.895847746)
-
 @csrf_exempt
 def register(request):
+
       user_face = UserFaceDataset()
       if request.method == "POST":
         user_name  = request.POST['user_name']
@@ -34,6 +33,7 @@ def register(request):
         embedding_path_store = "fr/embeddings/"
        
         try:
+       
           if path == "true":
             #load the image from url path  
             face_image = request.POST['face_image']   
@@ -49,12 +49,12 @@ def register(request):
 
           face = face_dlib(image)
           if face is None:
-            return JsonResponse({'errors': {'error_message': 'No face detected'}})
+            return JsonResponse(status=400, data={"status": 500,"info": "failed","data": [{"msg": "No face detected"}]})
 
           face_tensor = covert_to_tensor(face)        
           embedding_path = detect.insert_embedding(face_tensor, user_name,face_embedding)
           if embedding_path == False:
-            return JsonResponse({'errors': {'error_message': 'cannot recognize'}})
+            return JsonResponse(status=400, data={"status": 500,"info": "failed","data": [{"msg": "cannot recognize"}]})
           cv2.imwrite(upload_face_image,face)
           # insert to db    
           user_face.face_data.name =  embedding_path_store+embedding_path 
@@ -90,7 +90,7 @@ def search(request):
       # face detection    
       face = face_dlib(image)
       if face is None:
-        return JsonResponse({'errors': {'error_message': 'No face detected or Eyes detected'}})
+        return JsonResponse(status=400, data={"status": 500,"info": "failed","data": [{"msg": "No face detected or Eyes detected"}]})
       
       face_tensor = covert_to_tensor(face)
       replace = join(settings.MEDIA_ROOT,'fr/embeddings/')
@@ -100,6 +100,6 @@ def search(request):
               
       return JsonResponse({"status": 200,"info": "success","data": [{"msg": user_name}]})
     except Exception as e:
-      return JsonResponse({'errors': {'error_message': str(e)}})   
+      return JsonResponse(status=400, data={"status": 500,"info": "failed","data": [{"msg": str(e)}]})  
   else:        
     return JsonResponse(status=400, data={"status": "500","info": "fail","data": [{"msg": "allow only post"}]})

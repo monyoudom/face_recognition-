@@ -104,8 +104,6 @@ def identify_face(embedding):
     # start = time.time()
     min_distance = 100
     result = "unknow"
-    embeddings = []
-    names = []
     try:
         for embedding_file in glob.iglob(path_embedding+"*.npy"):
             database_embedding = np.load(embedding_file)
@@ -117,16 +115,15 @@ def identify_face(embedding):
         proba = face_distance_to_conf(min_distance)
         # print("Neural network forward pass took {} seconds.".format(
         #         time.time() - start))
-        print(proba,embeddings)
-        if proba > 0.90:
-            return result+" {0:.2f}".format(proba*100)+"%"
+        if proba > 0.8483:
+            return result
         return "unknow"
     except Exception as e:
         print(e)
         return "unknow"
 
 
-def face_distance_to_conf(face_distance, face_match_threshold=0.85):
+def face_distance_to_conf(face_distance, face_match_threshold=0.84):
     if face_distance > face_match_threshold:
         range = (1.0 - face_match_threshold)
         linear_val = (1.0 - face_distance) / (range * 2.0)
