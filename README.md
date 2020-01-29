@@ -7,10 +7,6 @@
 
 <h4 align="center">Face recognition 
 
-
-
-## Frontend:
-  - Python ( QT )
 ## Backend
    - Django
 
