@@ -31,3 +31,10 @@ python3 websocket.py
 
 ## Setup Virtual environments
 For detailed explanation on how things work, checkout the [guide](https://docs.python.org/3/library/venv.html)
+
+
+## API document
+  [document link](https://docs.google.com/document/d/1GtruxdlctatxAgrFVuV1kcDvnR5riRDii_eCo7dPkMc/edit?usp=sharing)
+  
+ ## License
+Udaya is licensed under the [ Udaya ](LICENSE).
