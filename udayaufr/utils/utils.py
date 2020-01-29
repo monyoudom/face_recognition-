@@ -8,15 +8,11 @@ from torch.optim.lr_scheduler import MultiStepLR
 from torch.utils.tensorboard import SummaryWriter
 from torchvision import datasets, transforms
 
-import tensorflow as tf
 import numpy as np
 import glob
 import os
 from scipy.misc import imresize, imsave
 from collections import defaultdict
-# from sklearn.svm import SVC
-import cv2
-import imutils
 import math
 import dlib
 from imutils import face_utils
@@ -28,7 +24,7 @@ APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 resnet = InceptionResnetV1(pretrained='vggface2').eval().to(device)
 root_path = APP_ROOT.replace('/utils','')
-# resnet = InceptionResnetV1(classify=True, num_classes=1001).eval()
+
 
 shape_predictor_68_face_landmarks  = APP_ROOT + "/model/shape_predictor_68_face_landmarks.dat"
 detector = dlib.get_frontal_face_detector()
@@ -68,7 +64,6 @@ def extract_face(img, box, image_size=160, margin=1):
 
     
     face = img[box[1]:box[1]+box[3],box[0]:box[0]+box[2]]
-    face = cv2.resize(face, (image_size,image_size), interpolation = cv2.INTER_CUBIC)
     return face
     
 def covert_to_tensor(image):
@@ -93,7 +88,7 @@ def save_embedding(embedding, filename, embeddings_path):
         np.save(path, embedding)
 
     except Exception as e:
-        print(str(e))
+        return e
         
 def remove_file_extension(filename):
    
@@ -113,13 +108,10 @@ def identify_face(embedding):
                 result =  remove_file_extension(embedding_file)
                 result = result.replace(path_embedding,'')  
         proba = face_distance_to_conf(min_distance)
-        # print("Neural network forward pass took {} seconds.".format(
-        #         time.time() - start))
-        if proba > 0.8483:
+        if proba > 0.87:
             return result
         return "unknow"
     except Exception as e:
-        print(e)
         return "unknow"
 
 

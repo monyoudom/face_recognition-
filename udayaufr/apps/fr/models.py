@@ -10,10 +10,9 @@ from django.dispatch import receiver
 #       return str(self.gender)
 
 class UserFaceDataset(models.Model):
-  user_name = models.CharField(max_length=50,unique=True)
-  face_images = models.FileField(upload_to='fr/faces')
-  face_data = models.FileField(upload_to='fr/embeddings')
-  # gender    = models.ForeignKey(Gender,on_delete=models.CASCADE)
+  user_name = models.CharField(max_length=50)
+  face_images = models.FileField(upload_to='fr/faces/')
+  face_data = models.FileField(upload_to='fr/embeddings/')
   register_date = models.DateField(auto_now=True,auto_now_add=False)
   update        = models.DateField(auto_now=False,auto_now_add=True)
   def save(self, *args, **kwargs):
@@ -21,6 +20,7 @@ class UserFaceDataset(models.Model):
       super(UserFaceDataset, self).save(*args, **kwargs)
       return True
     else:
+      
       return False
 
 

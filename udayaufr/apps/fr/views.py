@@ -2,19 +2,17 @@
 from .models import UserFaceDataset
 from django.http import JsonResponse
 import numpy as np
-import cv2
-import urllib.request
 from .models import UserFaceDataset
 from os.path import join
-from utils import detect
 from django.conf import settings
 from  utils.utils import face_dlib,covert_to_tensor
-from utils import statuscode
+from utils import statuscode,detect
 from django.views.decorators.csrf import csrf_exempt
 from django.db import IntegrityError
-import json
 from django.http import HttpResponse
 from scipy.misc import imread
+from django.core.files.storage import default_storage
+
 
 @csrf_exempt
 def register(request):
@@ -22,10 +20,8 @@ def register(request):
       user_face = UserFaceDataset()
       if request.method == "POST":
         user_name  = request.POST['user_name']
-        path       = request.POST['path']
-  
+
         # varible for upload image
-        upload_face_image = join(settings.MEDIA_ROOT,'fr/faces/'+str(user_name)+'.png')
         face_embedding = join(settings.MEDIA_ROOT,'fr/embeddings/')
           
         # varible to insert path to db
@@ -33,59 +29,41 @@ def register(request):
         embedding_path_store = "fr/embeddings/"
        
         try:
-       
-          if path == "true":
-            #load the image from url path  
-            face_image = request.POST['face_image']   
-            req = urllib.request.urlopen(face_image)
-            image = np.asarray(bytearray(req.read()), dtype="uint8")
-            image = cv2.imdecode(image, cv2.COLOR_RGB2BGR)
-            if image is None:
-              return  JsonResponse(status=200, data={"status": 500,"info": "failed","data": [{"msg": "have no eye"}]})
-          else:
-            face_image = request.FILES['face_image'] 
-            image = np.asarray(bytearray(face_image.read()), dtype="uint8")
-            image = cv2.imdecode(image, cv2.COLOR_RGB2BGR)
-
+          face_image = request.FILES['face_image']
+          image = imread(name=face_image, mode='RGB')
           face = face_dlib(image)
-          if face is None:
-            return JsonResponse(status=200, data={"status": 500,"info": "failed","data": [{"msg": "No face detected"}]})
+          if face is None or len(face) > 2 :
+            return JsonResponse(status=200, data={"status": 500,"info": "failed","data": [{"msg": "No face detected or face more than two"}]})
 
-          face_tensor = covert_to_tensor(face)        
+          face_tensor = covert_to_tensor(face)     
           embedding_path = detect.insert_embedding(face_tensor, user_name,face_embedding)
           if embedding_path == False:
-            return JsonResponse(status=200, data={"status": 500,"info": "failed","data": [{"msg": "cannot recognize"}]})
-          cv2.imwrite(upload_face_image,face)
+            return JsonResponse(status=200, data={"status": 500,"info": "failed","data": [{"msg": "This face already register"}]})
+          
+          path = default_storage.save(face_path, request.FILES['face_image'])
+          
           # insert to db    
-          user_face.face_data.name =  embedding_path_store+embedding_path 
-          user_face.face_images.name = face_path  
+          user_face.face_data =  embedding_path_store+embedding_path 
+          user_face.face_images = path
           user_face.user_name = user_name
-          if user_face.save():
-            return JsonResponse(status=200, data={"status": 200,"info": "success","data": [{"msg": "user face add to database"}]})
-          else: 
-            return JsonResponse(status=200, data={"status": 400,"info": "failed","data": [{"msg": "user already exited"}]})
-   
+          if user_face.save() == False:
+           UserFaceDataset.objects.filter(user_name=user_name).update(face_images=path,face_data= embedding_path_store+embedding_path) 
+          
+          return JsonResponse(status=200, data={"status": 200,"info": "success","data": [{"msg": "user face add to database"}]})
         except Exception as e:
           return JsonResponse(status=200, data={"status": 500,"info": "fail","data": [{"msg": str(e)}]})
       else:
         return JsonResponse(status=200, data={"status": 500,"info": "fail","data": [{"msg": "allow only post"}]})
-            
 
+
+    
 @csrf_exempt   
 def search(request):
     
   if request.method == "POST":
-    path = request.POST['path']
     try:
-      if path == "true":
-        #load the image from url path  
-        face_image = request.POST['face_image']
-        req = urllib.request.urlopen(face_image)
-        image = np.asarray(bytearray(req.read()), dtype="uint8")
-        image = cv2.imdecode(image, cv2.IMREAD_COLOR)
-      else:
-        face_image = request.FILES['face_image']
-        image = imread(name=face_image, mode='RGB')
+      face_image = request.FILES['face_image']
+      image = imread(name=face_image, mode='RGB')
         
       # face detection    
       face = face_dlib(image)
