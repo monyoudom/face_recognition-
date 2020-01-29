@@ -41,7 +41,7 @@ def register(request):
             image = np.asarray(bytearray(req.read()), dtype="uint8")
             image = cv2.imdecode(image, cv2.COLOR_RGB2BGR)
             if image is None:
-              return  JsonResponse(status=400, data={"status": 500,"info": "failed","data": [{"msg": "have no eye"}]})
+              return  JsonResponse(status=200, data={"status": 500,"info": "failed","data": [{"msg": "have no eye"}]})
           else:
             face_image = request.FILES['face_image'] 
             image = np.asarray(bytearray(face_image.read()), dtype="uint8")
@@ -49,12 +49,12 @@ def register(request):
 
           face = face_dlib(image)
           if face is None:
-            return JsonResponse(status=400, data={"status": 500,"info": "failed","data": [{"msg": "No face detected"}]})
+            return JsonResponse(status=200, data={"status": 500,"info": "failed","data": [{"msg": "No face detected"}]})
 
           face_tensor = covert_to_tensor(face)        
           embedding_path = detect.insert_embedding(face_tensor, user_name,face_embedding)
           if embedding_path == False:
-            return JsonResponse(status=400, data={"status": 500,"info": "failed","data": [{"msg": "cannot recognize"}]})
+            return JsonResponse(status=200, data={"status": 500,"info": "failed","data": [{"msg": "cannot recognize"}]})
           cv2.imwrite(upload_face_image,face)
           # insert to db    
           user_face.face_data.name =  embedding_path_store+embedding_path 
@@ -90,7 +90,7 @@ def search(request):
       # face detection    
       face = face_dlib(image)
       if face is None:
-        return JsonResponse(status=400, data={"status": 500,"info": "failed","data": [{"msg": "No face detected or Eyes detected"}]})
+        return JsonResponse(status=200, data={"status": 500,"info": "failed","data": [{"msg": "No face detected or Eyes detected"}]})
       
       face_tensor = covert_to_tensor(face)
       replace = join(settings.MEDIA_ROOT,'fr/embeddings/')
@@ -100,6 +100,6 @@ def search(request):
               
       return JsonResponse({"status": 200,"info": "success","data": [{"msg": user_name}]})
     except Exception as e:
-      return JsonResponse(status=400, data={"status": 500,"info": "failed","data": [{"msg": str(e)}]})  
+      return JsonResponse(status=200, data={"status": 500,"info": "failed","data": [{"msg": str(e)}]})  
   else:        
-    return JsonResponse(status=400, data={"status": "500","info": "fail","data": [{"msg": "allow only post"}]})
+    return JsonResponse(status=200, data={"status": "500","info": "fail","data": [{"msg": "allow only post"}]})

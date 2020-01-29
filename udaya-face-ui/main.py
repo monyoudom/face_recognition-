@@ -17,7 +17,7 @@ from imutils import face_utils
 import time
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
-ws = create_connection("ws://192.168.11.78:8001/websocket")
+ws = create_connection("ws://localhost:8001/websocket")
 p =APP_ROOT + "/static/shape_predictor_68_face_landmarks.dat"
 
 class USER(QDialog):        # Dialog box for entering name and key of new dataset.
