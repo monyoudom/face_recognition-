@@ -16,7 +16,7 @@
 
 cd udayaufr
 # run virtual environments
-python3 -m venv
+python3 -m venv tutorial-env
 # activate
 source tutorial-env/bin/activate
 # install dependencies
