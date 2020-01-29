@@ -13,6 +13,8 @@
 ## Build Setup
 
 ``` bash
+cd udayaufr
+
 # install dependencies
 python3 install -r requirments.txt
 
