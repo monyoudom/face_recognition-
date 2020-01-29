@@ -13,6 +13,7 @@
 ## Build Setup
 
 ``` bash
+
 cd udayaufr
 # run virtual environments
 python3 -m venv
@@ -20,14 +21,11 @@ python3 -m venv
 source tutorial-env/bin/activate
 # install dependencies
 python3 install -r requirments.txt
-
 # serve with hot reload at localhost:8000
 python3 manage.py runserver
-
 # websocket
 python3 websocket.py
-# Frontend 
-python3 main.py
+
 
 ```
 
