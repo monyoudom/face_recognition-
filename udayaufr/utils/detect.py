@@ -1,4 +1,3 @@
-import cv2
 from .utils import (save_embedding,identify_face,face_dlib ,embedding_caluation,covert_to_tensor)
 import numpy as np
 from scipy.misc import imread

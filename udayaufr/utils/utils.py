@@ -15,7 +15,6 @@ from scipy.misc import imresize, imsave
 from collections import defaultdict
 import math
 import dlib
-from imutils import face_utils
 from torchvision.transforms import functional as F
 import time
 
@@ -41,13 +40,11 @@ def fixed_image_standardization(image_tensor):
 
 def face_dlib(image):
     rects = detector(image, 1)
-    for (i, rect) in enumerate(rects):
-        shape = predictor(image, rect)
-        shape = face_utils.shape_to_np(shape)
-        # (x, y, w, h) = face_utils.rect_to_bb(rect)
-        # roi_image = image[y:y+h, x:x+w]
-        face = extract_face(image,face_utils.rect_to_bb(rect))
-        return face 
+    if len(rects) >= 2:
+        return None
+    (x, y, w, h)  = rects[0].left(), rects[0].top(), rects[0].width(), rects[0].height()
+    face = extract_face(image,(x, y, w, h))
+    return face 
 
 def extract_face(img, box, image_size=160, margin=1):
     margin = [

@@ -32,7 +32,7 @@ def register(request):
           face_image = request.FILES['face_image']
           image = imread(name=face_image, mode='RGB')
           face = face_dlib(image)
-          if face is None or len(face) > 2 :
+          if face is None:
             return JsonResponse(status=200, data={"status": 500,"info": "failed","data": [{"msg": "No face detected or face more than two"}]})
 
           face_tensor = covert_to_tensor(face)     
