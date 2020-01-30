@@ -20,7 +20,7 @@ python3 -m venv tutorial-env
 # activate
 source tutorial-env/bin/activate
 # install dependencies
-python3 install -r requirments.txt
+pip3 install -r requirments.txt
 # serve with hot reload at localhost:8000
 python3 manage.py runserver
 # websocket
