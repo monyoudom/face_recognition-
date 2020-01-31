@@ -37,8 +37,7 @@ def register(request):
 
           face_tensor = covert_to_tensor(face)     
           embedding_path = detect.insert_embedding(face_tensor, user_name,face_embedding)
-          if embedding_path == False:
-            return JsonResponse(status=200, data={"status": 500,"info": "failed","data": [{"msg": "This face already register"}]})
+         
           
           path = default_storage.save(face_path, request.FILES['face_image'])
           

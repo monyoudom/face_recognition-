@@ -40,10 +40,11 @@ def fixed_image_standardization(image_tensor):
 
 def face_dlib(image):
     rects = detector(image, 1)
-    if len(rects) >= 2:
+    if len(rects) == 1:
+        (x, y, w, h)  = rects[0].left(), rects[0].top(), rects[0].width(), rects[0].height()
+        face = extract_face(image,(x, y, w, h))
+    else:
         return None
-    (x, y, w, h)  = rects[0].left(), rects[0].top(), rects[0].width(), rects[0].height()
-    face = extract_face(image,(x, y, w, h))
     return face 
 
 def extract_face(img, box, image_size=160, margin=1):
