@@ -7,5 +7,5 @@ Pillow==6.2.0
 torch==1.7.1
 tornado==6.0.3
 virtualenv==16.6.0
-torchvision==0.4.2
+torchvision==0.8.2
 tensorboard==1.14.0
