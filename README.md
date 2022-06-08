@@ -36,4 +36,4 @@ For detailed explanation on how things work, checkout the [guide](https://docs.p
   [document link](https://docs.google.com/document/d/1GtruxdlctatxAgrFVuV1kcDvnR5riRDii_eCo7dPkMc/edit?usp=sharing)
   
  ## License
-Udaya is licensed under the [ Udaya ](LICENSE).
+Yourneed Solution is licensed under the [ Yourneed Solution ](LICENSE).
